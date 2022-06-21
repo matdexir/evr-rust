@@ -1,7 +1,10 @@
 use chrono::{serde::ts_seconds, DateTime, NaiveDateTime, TimeZone, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Result;
-use std::io;
+use std::{
+    fs::{self, File},
+    io::{self, ErrorKind, Read, Write},
+};
 
 #[derive(Debug, Deserialize, Serialize)]
 enum Urgency {
@@ -28,6 +31,11 @@ struct Todos {
 }
 
 fn main() -> Result<()> {
+    // TODO:
+    // Find a way to incorporate filepath
+    // let filepath = String::from("./");
+    let filename = String::from("data.json");
+    let mut f = File::create(&filename).unwrap();
     let mut todos = Todos { items: Vec::new() };
     let end_message = String::from("end");
     println!(
@@ -76,6 +84,7 @@ fn main() -> Result<()> {
     for (i, todo) in todos.items.iter().enumerate() {
         let j = serde_json::to_string(&todo)?;
         println!("{}- {:?}", i, j.to_string());
+        f.write_all(j.to_string().as_bytes()).unwrap();
     }
     println!("That's it for today");
     Ok(())
